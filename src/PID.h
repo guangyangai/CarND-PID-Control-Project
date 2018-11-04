@@ -41,6 +41,11 @@ public:
   * Calculate the total PID error.
   */
   double TotalError();
+  
+  /*
+  * Find the optimal Kp, Ki, Kd values
+  */
+  void Twiddle(double cte, double speed, double angle);
 };
 
 #endif /* PID_H */
