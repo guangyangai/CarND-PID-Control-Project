@@ -70,7 +70,7 @@ int main()
             pid.Twiddle(cte, tol, max_steps);}
           steer_value =  pid.TotalError();
           //slow down the vehicle at big turns
-          throttle = 1.0 - 0.8 * fabs(steer_value);
+          throttle = 1.0 - fabs(steer_value);
           // DEBUG
           //std::cout << "CTE: " << cte << " Steering Value: " << steer_value  << "Throttle Value: " << throttle << std::endl;
           json msgJson;

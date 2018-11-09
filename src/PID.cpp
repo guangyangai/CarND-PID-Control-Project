@@ -28,7 +28,7 @@ void PID::Init(double Kp, double Ki, double Kd) {
   this->dp = {0.1*Kp, 0.1*Kd, 0.1*Ki};
   this->step = 1;
   this->parameter_index = 2; 
-  this->n_forward_steps = 100;
+  this->n_forward_steps = 10;
   this->n_eval_steps = 1000;
   this->total_error = 0;
   this->best_error = std::numeric_limits<double>::max();
@@ -106,6 +106,9 @@ void PID::Twiddle(double cte, double tol, int max_steps){
   }//end of if
   step++;
   if(dp[0]+dp[1]+dp[2]<tol && step > max_steps){
+    Kp = p[0];
+    Ki = p[2];
+    Kd = p[1];
     parameter_twiddled = true;
     reset = true;}
 }
