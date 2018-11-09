@@ -1,6 +1,7 @@
 #ifndef PID_H
 #define PID_H
-
+#include <vector>
+#include <limits>
 class PID {
 public:
   /*
@@ -16,6 +17,23 @@ public:
   double Kp;
   double Ki;
   double Kd;
+  
+  /*
+  * Parameters for twiddle
+  */
+  bool parameter_twiddled;
+  bool reset;
+  bool tried_add;
+  bool tried_substract;
+  //vector of change
+  std::vector<double> dp;
+  
+  int step;
+  int parameter_index;
+  // number of steps to allow simulator to run forward, then to evaluate cte
+  int n_forward_steps, n_eval_steps;
+  // error tracker
+  double total_error, best_error;
 
   /*
   * Constructor
@@ -45,7 +63,7 @@ public:
   /*
   * Find the optimal Kp, Ki, Kd values
   */
-  void Twiddle(double cte, double speed, double angle);
+  void Twiddle(double cte, double tol, int max_steps);
 };
 
 #endif /* PID_H */

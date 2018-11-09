@@ -34,7 +34,8 @@ int main()
 
   PID pid;
   // TODO: Initialize the pid variable.
-  pid.Init(0.15, 0.0, 2.5);
+  pid.Init(0.15, 0, 2.5);
+  //pid.Init(0.5, 0, 1);
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -57,20 +58,34 @@ int main()
           * NOTE: Feel free to play around with the throttle and speed. Maybe use
           * another PID controller to control the speed!
           */
-          pid.Twiddle(cte, speed, angle);
+          //set up a number of the time steps and an upper limit of the accumulated error. 
+          //Once it reached the number or the upper limit, it is defined as one step in the optimization. 
+          //We then examine the accumulated error to perform twiddle.
+          int max_steps = 10000;
+          double tol =  0.001;
           pid.UpdateError(cte);
-          steer_value = -pid.Kp * pid.p_error - pid.Kd * pid.d_error - pid.Ki * pid.i_error;
+          //std::cout <<"is twiddled"<< pid.parameter_twiddled << std::endl;
+          //std::cout <<"is reset"<< pid.reset << std::endl;
+          if(!pid.parameter_twiddled){
+            pid.Twiddle(cte, tol, max_steps);}
+          steer_value =  pid.TotalError();
           //slow down the vehicle at big turns
-          throttle = 1.0 - 0.5 * fabs(steer_value);
-          double total_cte = pid.TotalError();
+          throttle = 1.0 - 0.8 * fabs(steer_value);
           // DEBUG
-          std::cout << "CTE: " << cte << " Steering Value: " << steer_value  << "Throttle Value: " << throttle << std::endl;
+          //std::cout << "CTE: " << cte << " Steering Value: " << steer_value  << "Throttle Value: " << throttle << std::endl;
           json msgJson;
           msgJson["steering_angle"] = steer_value;
           msgJson["throttle"] = throttle;
+          //code to reset the simnulator 
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
-          std::cout << msg << std::endl;
+          //std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
+          //reset the simulator
+          if(pid.reset){
+            std::string msg = "42[\"reset\",{}]";
+            ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
+            pid.reset = false;
+          }
         }
       } else {
         // Manual driving
