@@ -2,6 +2,9 @@
 Self-Driving Car Engineer Nanodegree Program
 
 ---
+## Reflections
+P component of PID algorithm helps the vehicle to minimize the tracking error. D component helps the vehicle to prevent overshoot and smoothly approaching small CTE zones. I component helps to correct systematic error. If total error stablizes, I component will correct this error. The effect can be seen when each component changed from zero to some non-zero value. 
+The final P, I, D value are chosen by combination of manual change and twiddle. First an initial set needs to be carefully chosen to let the vehicle finishes certain distances, and then the parameters can be twiddled to reach better control.
 
 ## Dependencies
 
